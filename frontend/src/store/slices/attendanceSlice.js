@@ -1,8 +1,10 @@
 // src/store/slices/attendanceSlice.js
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
+import API_BASE_URL from '../../config/api';
 
-const API_URL = 'http://localhost:5000/api';
+// Use the API_BASE_URL from config instead of hardcoded localhost
+const API_URL = `${API_BASE_URL}/api`;
 
 // Async thunks
 export const checkIn = createAsyncThunk(
@@ -15,7 +17,7 @@ export const checkIn = createAsyncThunk(
       });
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue(error.response?.data || { message: 'Network error' });
     }
   }
 );
@@ -30,7 +32,7 @@ export const checkOut = createAsyncThunk(
       });
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue(error.response?.data || { message: 'Network error' });
     }
   }
 );
@@ -45,7 +47,7 @@ export const getTodayStatus = createAsyncThunk(
       });
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue(error.response?.data || { message: 'Network error' });
     }
   }
 );
@@ -61,7 +63,7 @@ export const getMyHistory = createAsyncThunk(
       });
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue(error.response?.data || { message: 'Network error' });
     }
   }
 );
@@ -77,7 +79,7 @@ export const getMySummary = createAsyncThunk(
       });
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue(error.response?.data || { message: 'Network error' });
     }
   }
 );
@@ -94,7 +96,7 @@ export const getAllAttendance = createAsyncThunk(
       });
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue(error.response?.data || { message: 'Network error' });
     }
   }
 );
@@ -127,7 +129,7 @@ const attendanceSlice = createSlice({
       })
       .addCase(checkIn.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload.message;
+        state.error = action.payload?.message || 'Check-in failed';
       })
       // Check Out
       .addCase(checkOut.pending, (state) => {
@@ -140,23 +142,35 @@ const attendanceSlice = createSlice({
       })
       .addCase(checkOut.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload.message;
+        state.error = action.payload?.message || 'Check-out failed';
       })
       // Get Today Status
       .addCase(getTodayStatus.fulfilled, (state, action) => {
         state.todayStatus = action.payload;
       })
+      .addCase(getTodayStatus.rejected, (state, action) => {
+        state.error = action.payload?.message || 'Failed to get today status';
+      })
       // Get My History
       .addCase(getMyHistory.fulfilled, (state, action) => {
         state.myHistory = action.payload;
+      })
+      .addCase(getMyHistory.rejected, (state, action) => {
+        state.error = action.payload?.message || 'Failed to get history';
       })
       // Get My Summary
       .addCase(getMySummary.fulfilled, (state, action) => {
         state.mySummary = action.payload;
       })
+      .addCase(getMySummary.rejected, (state, action) => {
+        state.error = action.payload?.message || 'Failed to get summary';
+      })
       // Get All Attendance (Manager)
       .addCase(getAllAttendance.fulfilled, (state, action) => {
         state.allAttendance = action.payload;
+      })
+      .addCase(getAllAttendance.rejected, (state, action) => {
+        state.error = action.payload?.message || 'Failed to get all attendance';
       });
   },
 });
