@@ -1,4 +1,3 @@
-// src/App.js
 import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
@@ -26,43 +25,53 @@ function App() {
   }, [dispatch]);
 
   if (loading) {
-    return <div className="loading">Loading...</div>;
+    return (
+      <div className="loading-container">
+        <div className="spinner"></div>
+        <p>Loading...</p>
+      </div>
+    );
   }
 
   return (
     <Router>
       <div className="App">
         <Routes>
+          {/* Public Routes */}
           <Route 
             path="/login" 
-            element={!isAuthenticated ? <Login /> : <Navigate to="/dashboard" />} 
+            element={!isAuthenticated ? <Login /> : <Navigate to="/dashboard" replace />} 
           />
           <Route 
             path="/register" 
-            element={!isAuthenticated ? <Register /> : <Navigate to="/dashboard" />} 
+            element={!isAuthenticated ? <Register /> : <Navigate to="/dashboard" replace />} 
           />
           
-          {isAuthenticated && (
-            <Route path="/" element={<Layout />}>
-              <Route 
-                path="dashboard" 
-                element={user?.role === 'manager' ? <ManagerDashboard /> : <EmployeeDashboard />} 
-              />
-              <Route path="attendance" element={<MarkAttendance />} />
-              <Route path="history" element={<AttendanceHistory />} />
-              
-              {user?.role === 'manager' && (
-                <>
-                  <Route path="all-attendance" element={<AllAttendance />} />
-                  <Route path="reports" element={<Reports />} />
-                </>
-              )}
-              
-              <Route path="/" element={<Navigate to="/dashboard" />} />
-            </Route>
-          )}
+          {/* Protected Routes with Layout */}
+          <Route 
+            path="/" 
+            element={isAuthenticated ? <Layout /> : <Navigate to="/login" replace />}
+          >
+            <Route 
+              path="dashboard" 
+              element={user?.role === 'manager' ? <ManagerDashboard /> : <EmployeeDashboard />} 
+            />
+            <Route path="attendance" element={<MarkAttendance />} />
+            <Route path="history" element={<AttendanceHistory />} />
+            
+            {/* Manager-only routes */}
+            {user?.role === 'manager' && (
+              <>
+                <Route path="all-attendance" element={<AllAttendance />} />
+                <Route path="reports" element={<Reports />} />
+              </>
+            )}
+            
+            <Route index element={<Navigate to="/dashboard" replace />} />
+          </Route>
           
-          <Route path="*" element={<Navigate to={isAuthenticated ? "/dashboard" : "/login"} />} />
+          {/* Catch all route */}
+          <Route path="*" element={<Navigate to={isAuthenticated ? "/dashboard" : "/login"} replace />} />
         </Routes>
       </div>
     </Router>

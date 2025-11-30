@@ -7,7 +7,6 @@ const moment = require('moment');
 
 const router = express.Router();
 
-// Employee dashboard
 router.get('/employee', auth, async (req, res) => {
   try {
     const userId = req.user.id;
