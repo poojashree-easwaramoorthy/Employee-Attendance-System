@@ -8,7 +8,7 @@ const app = express();
 // CORS Configuration
 const corsOptions = {
   origin: [
-    'https://employee-attendance-system-hhshrykn4.vercel.app', // Your Vercel frontend URL
+    'https://employee-attendance-system-brown.vercel.app', // Your Vercel frontend URL
     'http://localhost:3000', // For local development
     'http://127.0.0.1:3000' // Alternative localhost
   ],
